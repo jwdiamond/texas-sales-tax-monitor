@@ -1,0 +1,167 @@
+{
+  "asof": "September 2026",
+  "period": "2026-09",
+  "industry": [
+    {
+      "name": "Agriculture",
+      "receipts": 2318549,
+      "yoy": -5.02,
+      "group": "Other"
+    },
+    {
+      "name": "Mining",
+      "receipts": 187647021,
+      "yoy": 31.21,
+      "group": "Business / industrial"
+    },
+    {
+      "name": "Utilities",
+      "receipts": 134404529,
+      "yoy": 84.1,
+      "group": "Business / industrial"
+    },
+    {
+      "name": "Construction",
+      "receipts": 228626065,
+      "yoy": 17.78,
+      "group": "Business / industrial"
+    },
+    {
+      "name": "Manufacturing",
+      "receipts": 354688385,
+      "yoy": 17.32,
+      "group": "Business / industrial"
+    },
+    {
+      "name": "Wholesale Trade",
+      "receipts": 411469024,
+      "yoy": 15.41,
+      "group": "Business / industrial"
+    },
+    {
+      "name": "Retail Trade",
+      "receipts": 1572930560,
+      "yoy": 3.01,
+      "group": "Consumer-facing"
+    },
+    {
+      "name": "Transportation",
+      "receipts": 56993453,
+      "yoy": 9.83,
+      "group": "Mixed"
+    },
+    {
+      "name": "Information",
+      "receipts": 297638243,
+      "yoy": 7.52,
+      "group": "Mixed"
+    },
+    {
+      "name": "Finance and Insurance",
+      "receipts": 33404507,
+      "yoy": 12.19,
+      "group": "Mixed"
+    },
+    {
+      "name": "Real Estate, Rental and Leasing",
+      "receipts": 128284403,
+      "yoy": 17.48,
+      "group": "Mixed"
+    },
+    {
+      "name": "Services",
+      "receipts": 473422344,
+      "yoy": 13.78,
+      "group": "Mixed"
+    },
+    {
+      "name": "Eating and Drinking Places",
+      "receipts": 441750107,
+      "yoy": 2.52,
+      "group": "Consumer-facing"
+    },
+    {
+      "name": "Public Administration",
+      "receipts": 20668400,
+      "yoy": 3.29,
+      "group": "Other"
+    },
+    {
+      "name": "No Code",
+      "receipts": 62099175,
+      "yoy": 185.69,
+      "group": "Unclassified"
+    }
+  ],
+  "retail": [
+    {
+      "name": "Automotive Dealers",
+      "receipts": 103838032,
+      "yoy": 11.73
+    },
+    {
+      "name": "Building Materials and Garden Equipment Stores",
+      "receipts": 186098526,
+      "yoy": -1.27
+    },
+    {
+      "name": "Clothing and Accessories Stores",
+      "receipts": 130470023,
+      "yoy": 3.99
+    },
+    {
+      "name": "Electronic Shopping, Vending Machine, and Direct Sellers",
+      "receipts": 304079153,
+      "yoy": -5.51
+    },
+    {
+      "name": "Electronics and Appliances",
+      "receipts": 75374377,
+      "yoy": 16.24
+    },
+    {
+      "name": "Food and Beverage Stores",
+      "receipts": 138296262,
+      "yoy": -1.41
+    },
+    {
+      "name": "Furniture and Home Furnishing Stores",
+      "receipts": 56627701,
+      "yoy": -2.11
+    },
+    {
+      "name": "Gasoline Stations",
+      "receipts": 88431341,
+      "yoy": -0.39
+    },
+    {
+      "name": "General Merchandise Stores",
+      "receipts": 272090250,
+      "yoy": 4.06
+    },
+    {
+      "name": "Health and Personal Care Stores",
+      "receipts": 27091873,
+      "yoy": 4.78
+    },
+    {
+      "name": "Miscellaneous Retail",
+      "receipts": 137772300,
+      "yoy": 25.25
+    },
+    {
+      "name": "Sporting Goods, Hobby, Musical, and Book Stores",
+      "receipts": 52740756,
+      "yoy": 8.18
+    }
+  ],
+  "industry_reported_total": 4406344765,
+  "retail_reported_total": 1572910594,
+  "state_cash_october": 4751191000,
+  "sources": {
+    "industry": "https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-industry.php",
+    "retail": "https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-retail.php",
+    "local": "https://data.texas.gov/Government-and-Taxes/Sales-Tax-Allocation-City-County-Comparison-Summar/53pa-m7sm",
+    "cash": "https://comptroller.texas.gov/transparency/revenue/watch/all-funds/"
+  }
+}
