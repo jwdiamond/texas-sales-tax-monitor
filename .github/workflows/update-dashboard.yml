@@ -12,6 +12,9 @@ on:
       - 'normalize_history.py'
       - 'validate_history.py'
       - '.github/workflows/update-dashboard.yml'
+      - 'fetch_city_history.py'
+      - 'fetch_local.py'
+      - 'patch_city_dashboard.py'
 
 permissions:
   contents: write
@@ -38,21 +41,24 @@ jobs:
         run: python normalize_history.py
       - name: Validate normalized history
         run: python validate_history.py
+      - name: Download and validate municipal allocations
+        run: python fetch_city_history.py --start-year 2023
       - name: Commit validated monthly observations
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add normalized/monthly.csv
+          git add normalized/monthly.csv local/city_allocations.csv local/years/*.csv
           if ! git diff --cached --quiet; then
             git commit -m 'Refresh validated Texas monthly industry history'
             git push origin HEAD:main
           fi
       - name: Assemble public site
         run: |
-          mkdir -p _site/normalized
+          mkdir -p _site/normalized _site/local
           cp index.html data.json _site/
           cp normalized/monthly.csv _site/normalized/monthly.csv
+          cp local/city_allocations.csv _site/local/city_allocations.csv
           touch _site/.nojekyll
       - name: Configure Pages
         uses: actions/configure-pages@v5
