@@ -41,5 +41,39 @@ el('historical-file').onchange=async()=>{try{const rows=await readFile('historic
 el('history-level').onchange=renderHistory;el('history-sector').onchange=renderTrend;el('reset-history').onclick=()=>{history=[];el('historical-file').value='';el('history-state').textContent='Snapshot only';el('history-msg').textContent='Historical data cleared.';renderHistory()};
 function renderLocal(){const county=el('local-county').value,period=el('local-period').value;let a=locals.filter(x=>x.county===county&&x.period===period).sort((x,y)=>y.payment-x.payment);el('local-rows').innerHTML=a.map(x=>`<tr><td>${escapeText(x.city)}</td><td class="num">${fmoney(x.payment)}</td><td class="num">${fmoney(x.prior)}</td><td class="num">${x.prior>0?((x.payment/x.prior-1)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')||'<tr><td colspan="4">No records for this selection.</td></tr>';let s=a.reduce((v,x)=>v+x.payment,0);el('local-msg').textContent=a.length+' cities in '+county+' for '+period+'. Sum of city allocations: '+fmoney(s)+'. Not countywide taxable sales.';}
 el('local-file').onchange=async()=>{try{let rows=await readFile('local-file');if(!rows)return;let req=['county','city','net_payment_this_period','comparable_payment_prior_year','report_month','report_year'];if(!rows.length||req.some(k=>!(k in rows[0])))throw Error('Expected fetch_local.py CSV with columns: '+req.join(', '));let out=rows.map((r,i)=>{let m=Number(r.report_month),y=Number(r.report_year),payment=toNumber(r.net_payment_this_period),prior=toNumber(r.comparable_payment_prior_year);if(!Number.isInteger(m)||m<1||m>12||!Number.isInteger(y)||y<2000||y>2100||!Number.isFinite(payment)||!Number.isFinite(prior))throw Error('Invalid month/year/payment on row '+(i+2));return{county:r.county,city:r.city,payment,prior,period:y+'-'+String(m).padStart(2,'0')}});locals=out;const counties=[...new Set(out.map(x=>x.county))].sort(),months=[...new Set(out.map(x=>x.period))].sort();el('local-county').innerHTML=counties.map(c=>`<option value="${escapeText(c)}">${escapeText(c)}</option>`).join('');el('local-period').innerHTML=months.map(c=>`<option value="${c}">${c}</option>`).join('');if(counties.includes('Harris'))el('local-county').value='Harris';el('local-period').value=months.at(-1);renderLocal()}catch(e){el('local-msg').textContent='Import failed: '+e.message}};el('local-county').onchange=renderLocal;el('local-period').onchange=renderLocal;renderHistory();
+
+async function loadHistoricalData() {
+  try {
+    const response = await fetch('./normalized/monthly.csv');
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const csvText = await response.text();
+    const rows = parseCSV(csvText);
+
+    const required = ['period', 'level', 'name', 'receipts'];
+
+    if (!rows.length || !required.every(c => c in rows[0])) {
+      throw new Error('Historical CSV has missing columns or no observations');
+    }
+
+    history = rows.map(r => ({
+      period: r.period,
+      level: r.level,
+      name: r.name,
+      receipts: Number(r.receipts)
+    }));
+
+    renderHistory();
+    console.log(`Loaded ${history.length} historical observations`);
+  } catch (error) {
+    console.error('Could not load historical data:', error);
+  }
+}
+
+loadHistoricalData();
+
 })();
 </script></body></html>
