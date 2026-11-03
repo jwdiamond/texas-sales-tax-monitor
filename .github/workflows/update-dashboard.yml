@@ -51,7 +51,9 @@ jobs:
           git add normalized/monthly.csv local/city_allocations.csv local/years/*.csv
           if ! git diff --cached --quiet; then
             git commit -m 'Refresh validated Texas monthly industry history'
+            git pull --rebase origin main
             git push origin HEAD:main
+
           fi
       - name: Assemble public site
         run: |
