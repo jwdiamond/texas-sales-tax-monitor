@@ -29,7 +29,20 @@
  #historical-module .import-row, #local-module .import-row { display:flex; flex-direction:column; align-items:stretch; }
 }
 </style>
-</head><body><main class="shell"><div class="hero"><div><div class="eyebrow">Economic & Fiscal Monitoring / Prototype v0.2</div><h1>Texas Sales Tax Monitor</h1><p>Industry receipts, retail subsectors, and foundations for local revenue nowcasting</p></div><div class="tag">VERIFIED SNAPSHOT · SEP 2026</div></div><div class="grid" id="kpis"></div><div class="section cols"><section class="card"><h2>Industry revenue composition</h2><p>Monthly taxpayer remittances by NAICS sector (nominal dollars)</p><div class="controls"><button class="selected" data-bar="dollars">Receipts</button><button data-bar="growth">Year-over-year growth</button><button data-bar="contrib">Contribution to growth</button></div><div class="scroll" id="bars"></div></section><section class="card"><h2>Retail vs. business-related activity</h2><p>Broad analytical groupings of receipts by taxpayer industry</p><div id="groupings"></div><div class="note" style="margin-top:18px">Industry classification is based on the taxpayer's primary NAICS code. It does <b>not</b> directly separate final household consumption from intermediate business purchases. Mixed industries are shown separately.</div></section></div><div class="section card"><h2>Detailed sector explorer</h2><p>Sort by industry, receipts, or growth. Retail subsectors are already included in Retail Trade.</p><div class="controls"><button class="selected" data-tab="industry">All industries</button><button data-tab="retail">Retail subsectors</button><input id="search" placeholder="Find an industry or subsector..." aria-label="Search industries" style="flex:1;min-width:210px"></div><div class="scroll"><table><thead><tr><th data-sort="name">Industry / subsector ↕</th><th class="num" data-sort="receipts">Receipts ↕</th><th class="num" data-sort="yoy">YoY ↕</th><th class="num" data-sort="delta">Est. change vs year ago ↕</th></tr></thead><tbody id="rows"></tbody></table></div></div><div class="section card" id="historical-module"><div class="hero" style="margin-bottom:8px"><div><h2>Historical Sales Tax by Industry</h2><p>Explore monthly Texas sales tax receipts by industry and retail subsector.</p></div><span class="pill" id="history-state">Snapshot only</span></div><div class="import-row"><label for="historical-file">Choose historical CSV</label><input id="historical-file" type="file" accept=".csv,text/csv" aria-label="Import monthly industry CSV"><select id="history-level" aria-label="Series type"><option value="industry">Industries</option><option value="retail">Retail subsectors</option></select><select id="history-sector" aria-label="Historical sector"><option value="__total__">Total reported in file</option></select><button id="reset-history">Reset</button></div><div id="history-msg" class="status">Official monthly history loads automatically.</div><div class="three-cols"><div class="chart-wrap" id="history-chart"></div><div><div class="kpi-label">Latest monthly receipts</div><div class="kpi" id="history-latest">—</div><div class="sub" id="history-latest-date">Load monthly rows to begin</div><div style="margin-top:18px" class="kpi-label">Year-over-year growth</div><div class="kpi" id="history-yoy">—</div><div class="sub">Versus the same month one year earlier.</div><p class="status" id="history-count" style="margin-top:20px"></p></div></div><div class="note">Source: Texas Comptroller. Reported net receipts may be revised.</div></div>
+<style id="TEXAS_REAL_GROWTH_V1">
+#real-growth-controls {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 14px;padding:13px 17px;border:1px solid #dce5f0;border-radius:12px;background:#fff}
+#real-growth-controls label{font-size:13px;font-weight:650;color:#263a57}
+#real-growth-controls select{border:1px solid #ccd6e4;padding:9px 13px;border-radius:9px;color:#263a57;background:#fff}
+#cpi-indicator{font-size:12px;color:#63758d}
+.city-source-note{margin-left:12px;font-size:12px;color:#718198;font-weight:400}
+#historical-module .three-cols{grid-template-columns:minmax(0,1.9fr) minmax(210px, .8fr)}
+#historical-module #history-chart svg{width:100%;height:auto;min-height:300px}
+#historical-module .status,#local-module .status{line-height:1.5}
+#local-module .local-table{max-height:520px;overflow:auto}
+#local-module .local-table thead{position:sticky;top:0;background:#f2f5fa;z-index:1}
+@media(max-width:800px){#historical-module .three-cols{grid-template-columns:1fr}.city-source-note{display:block;margin-left:0}}
+</style>
+</head><body><main class="shell"><div class="hero"><div><div class="eyebrow">Economic & Fiscal Monitoring / Prototype v0.2</div><h1>Texas Sales Tax Monitor</h1><p>Industry receipts, retail subsectors, and foundations for local revenue nowcasting</p></div><div class="tag">VERIFIED SNAPSHOT · SEP 2026</div></div><div class="grid" id="kpis"></div><div class="section cols"><section class="card"><h2>Industry revenue composition</h2><p>Monthly taxpayer remittances by NAICS sector (reported nominal receipts)</p><div class="controls"><button class="selected" data-bar="dollars">Receipts</button><button data-bar="growth">Year-over-year growth</button><button data-bar="contrib">Contribution to growth</button></div><div class="scroll" id="bars"></div></section><section class="card"><h2>Retail vs. business-related activity</h2><p>Broad analytical groupings of receipts by taxpayer industry</p><div id="groupings"></div><div class="note" style="margin-top:18px">Industry classification is based on the taxpayer's primary NAICS code. It does <b>not</b> directly separate final household consumption from intermediate business purchases. Mixed industries are shown separately.</div></section></div><div class="section card"><h2>Detailed sector explorer</h2><p>Sort by industry, receipts, or growth. Retail subsectors are already included in Retail Trade.</p><div class="controls"><button class="selected" data-tab="industry">All industries</button><button data-tab="retail">Retail subsectors</button><input id="search" placeholder="Find an industry or subsector..." aria-label="Search industries" style="flex:1;min-width:210px"></div><div class="scroll"><table><thead><tr><th data-sort="name">Industry / subsector ↕</th><th class="num" data-sort="receipts">Receipts ↕</th><th class="num" data-sort="yoy">YoY ↕</th><th class="num" data-sort="delta">Est. change vs year ago ↕</th></tr></thead><tbody id="rows"></tbody></table></div></div><div id="real-growth-controls"><label for="price-mode">Revenue values</label><select id="price-mode" aria-label="Nominal or inflation-adjusted"><option value="nominal">Nominal dollars</option><option value="real">Real (CPI-adjusted)</option></select><span id="cpi-indicator">Loading CPI-U…</span></div><div class="section card" id="historical-module"><div class="hero" style="margin-bottom:8px"><div><h2>Historical Sales Tax by Industry</h2><p>Explore monthly Texas sales tax receipts by industry and retail subsector.</p></div><span class="pill" id="history-state">Snapshot only</span></div><div class="import-row"><label for="historical-file">Choose historical CSV</label><input id="historical-file" type="file" accept=".csv,text/csv" aria-label="Import monthly industry CSV"><select id="history-level" aria-label="Series type"><option value="industry">Industries</option><option value="retail">Retail subsectors</option></select><select id="history-sector" aria-label="Historical sector"><option value="__total__">Total reported in file</option></select><button id="reset-history">Reset</button></div><div id="history-msg" class="status">Official monthly history loads automatically.</div><div class="three-cols"><div class="chart-wrap" id="history-chart"></div><div><div class="kpi-label">Latest monthly receipts</div><div class="kpi" id="history-latest">—</div><div class="sub" id="history-latest-date">Load monthly rows to begin</div><div style="margin-top:18px" class="kpi-label">Year-over-year growth</div><div class="kpi" id="history-yoy">—</div><div class="sub">Versus the same month one year earlier.</div><p class="status" id="history-count" style="margin-top:20px"></p></div></div><div class="note">Source: Texas Comptroller. Real values use national CPI-U (not seasonally adjusted); figures may be revised.</div></div>
 <div class="section card" id="local-module"><h2>Monthly City Sales Tax Allocations</h2><p>Explore monthly sales tax revenue distributed to Texas municipalities. County selections group municipalities by their reported county.</p><div class="import-row"><label for="local-file">Choose local allocations CSV</label><input id="local-file" type="file" accept=".csv,text/csv" aria-label="Import local allocations CSV"><select id="local-county" aria-label="County"><option>Upload a CSV first</option></select><select id="local-period" aria-label="Report month"><option>—</option></select></div><div id="local-msg" class="status">Municipal allocation history loads automatically.</div><div class="local-table"><table><thead><tr><th>City</th><th class="num">Allocation</th><th class="num">Prior year</th><th class="num">YoY</th></tr></thead><tbody id="local-rows"><tr><td colspan="4">No source data loaded.</td></tr></tbody></table></div></div><div class="section card"><h2>Methods, definitions & sources</h2><div class="note">Official statewide NAICS series reflect taxpayer-account postings and may be revised. They can differ from Treasury cash-deposit figures. The Sept 2026 retail-subsector total differs slightly from the retail industry total; both are preserved as published. Estimates of the dollar change vs year ago are reconstructed from published rounded percentage changes and are therefore <b>approximate</b>. The classifications 'business / industrial' and 'consumer-facing' are initial analytical groupings, not official data fields.</div><div class="links"><a href="https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-industry.php" target="_blank">Industry source</a><a href="https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-retail.php" target="_blank">Retail source</a><a href="https://comptroller.texas.gov/transparency/revenue/watch/all-funds/" target="_blank">Revenue Watch</a><a href="https://data.texas.gov/d/53pa-m7sm" target="_blank">Local allocations</a></div><p class="status" style="margin-top:10px">Data: September 2026; local source last observed October 7, 2026. Not an official Texas Comptroller product.</p></div></main><script>
 const D={"asof": "September 2026", "period": "2026-09", "industry": [{"name": "Agriculture", "receipts": 2318549, "yoy": -5.02, "group": "Other"}, {"name": "Mining", "receipts": 187647021, "yoy": 31.21, "group": "Business / industrial"}, {"name": "Utilities", "receipts": 134404529, "yoy": 84.1, "group": "Business / industrial"}, {"name": "Construction", "receipts": 228626065, "yoy": 17.78, "group": "Business / industrial"}, {"name": "Manufacturing", "receipts": 354688385, "yoy": 17.32, "group": "Business / industrial"}, {"name": "Wholesale Trade", "receipts": 411469024, "yoy": 15.41, "group": "Business / industrial"}, {"name": "Retail Trade", "receipts": 1572930560, "yoy": 3.01, "group": "Consumer-facing"}, {"name": "Transportation", "receipts": 56993453, "yoy": 9.83, "group": "Mixed"}, {"name": "Information", "receipts": 297638243, "yoy": 7.52, "group": "Mixed"}, {"name": "Finance and Insurance", "receipts": 33404507, "yoy": 12.19, "group": "Mixed"}, {"name": "Real Estate, Rental and Leasing", "receipts": 128284403, "yoy": 17.48, "group": "Mixed"}, {"name": "Services", "receipts": 473422344, "yoy": 13.78, "group": "Mixed"}, {"name": "Eating and Drinking Places", "receipts": 441750107, "yoy": 2.52, "group": "Consumer-facing"}, {"name": "Public Administration", "receipts": 20668400, "yoy": 3.29, "group": "Other"}, {"name": "No Code", "receipts": 62099175, "yoy": 185.69, "group": "Unclassified"}], "retail": [{"name": "Automotive Dealers", "receipts": 103838032, "yoy": 11.73}, {"name": "Building Materials and Garden Equipment Stores", "receipts": 186098526, "yoy": -1.27}, {"name": "Clothing and Accessories Stores", "receipts": 130470023, "yoy": 3.99}, {"name": "Electronic Shopping, Vending Machine, and Direct Sellers", "receipts": 304079153, "yoy": -5.51}, {"name": "Electronics and Appliances", "receipts": 75374377, "yoy": 16.24}, {"name": "Food and Beverage Stores", "receipts": 138296262, "yoy": -1.41}, {"name": "Furniture and Home Furnishing Stores", "receipts": 56627701, "yoy": -2.11}, {"name": "Gasoline Stations", "receipts": 88431341, "yoy": -0.39}, {"name": "General Merchandise Stores", "receipts": 272090250, "yoy": 4.06}, {"name": "Health and Personal Care Stores", "receipts": 27091873, "yoy": 4.78}, {"name": "Miscellaneous Retail", "receipts": 137772300, "yoy": 25.25}, {"name": "Sporting Goods, Hobby, Musical, and Book Stores", "receipts": 52740756, "yoy": 8.18}], "industry_reported_total": 4406344765, "retail_reported_total": 1572910594, "state_cash_october": 4751191000, "sources": {"industry": "https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-industry.php", "retail": "https://comptroller.texas.gov/transparency/revenue/watch/naics/naics-retail.php", "local": "https://data.texas.gov/Government-and-Taxes/Sales-Tax-Allocation-City-County-Comparison-Summar/53pa-m7sm", "cash": "https://comptroller.texas.gov/transparency/revenue/watch/all-funds/"}};let tab='industry',bar='dollars',sortBy='receipts',sortDir=-1;const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n), compact=n=>n>=1e9?'$'+(n/1e9).toFixed(2)+'B':n>=1e6?'$'+(n/1e6).toFixed(1)+'M':fmt(n),rate=x=>(x>=0?'+':'')+x.toFixed(2)+'%',delta=x=>x.receipts*x.yoy/(100+x.yoy);const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 
@@ -59,14 +72,106 @@ const toNumber=v=>Number(String(v||'').replace(/[$,%\s]/g,'').replace(/,/g,''));
 const fmoney=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
 const fmtShort=n=>Math.abs(n)>=1e9?'$'+(n/1e9).toFixed(2)+'B':Math.abs(n)>=1e6?'$'+(n/1e6).toFixed(1)+'M':fmoney(n);
 const el=id=>document.getElementById(id);let history=[],locals=[];
+/* TEXAS_REAL_GROWTH_V1 — National CPI-U, not seasonally adjusted. */
+let cpiMonths=new Map(),cpiBasePeriod=null,cpiBaseValue=null;
+const isReal=()=>el('price-mode').value==='real';
+const prettyMonth=p=>/^\d{4}-\d{2}$/.test(p)?new Date(p+'-01T12:00:00Z').toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'}):p;
+const lastYear=p=>String(Number(p.slice(0,4))-1)+p.slice(4);
+function inflationRatio(p){const c=cpiMonths.get(p),prior=cpiMonths.get(lastYear(p));return c!==undefined&&prior!==undefined&&prior>0?c/prior:null;}
+function realDollars(p,n){const c=cpiMonths.get(p);return c!==undefined&&c>0&&cpiBaseValue!==null?n*cpiBaseValue/c:null;}
+function repaintPriceViews(){
+  renderTrend();renderLocal();
+  if(cityHistoryRows.length)renderCityComparisons();
+  const note=el('cpi-indicator');
+  note.textContent=cpiBasePeriod?('CPI-U national · through '+prettyMonth(cpiBasePeriod)+' · '+(isReal()?'constant '+prettyMonth(cpiBasePeriod)+' dollars':'nominal dollars')):'CPI not loaded — real values unavailable';
+}
+async function loadCPI(){
+  try{
+    const response=await fetch('./inflation/cpi_u.csv',{cache:'no-cache'});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    const csv=parseCSV(await response.text());
+    const map=new Map();
+    for(const row of csv){
+      if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(row.period))throw Error('Invalid CPI month');
+      const v=Number(row.cpi);
+      if(!Number.isFinite(v)||v<=0||map.has(row.period))throw Error('Invalid or duplicate CPI value');
+      map.set(row.period,v);
+    }
+    if(map.size<250)throw Error('CPI history unexpectedly short');
+    cpiMonths=map;cpiBasePeriod=[...map.keys()].sort().at(-1);cpiBaseValue=map.get(cpiBasePeriod);
+    repaintPriceViews();
+  }catch(error){el('cpi-indicator').textContent='CPI unavailable; nominal data still accessible';console.error('CPI load failed',error);}
+}
+el('price-mode').onchange=repaintPriceViews;
+loadCPI();
 function selectedHistory(){return history.filter(r=>r.level===el('history-level').value&&(el('history-sector').value==='__total__'||r.name===el('history-sector').value));}
-function renderHistory(){const lev=el('history-level').value,opts=[...new Set(history.filter(r=>r.level===lev).map(r=>r.name))].sort();const old=el('history-sector').value;el('history-sector').innerHTML='<option value="__total__">Sum of included sectors</option>'+opts.map(n=>'<option value="'+escapeText(n)+'">'+escapeText(n)+'</option>').join('');el('history-sector').value=opts.includes(old)?old:'__total__';renderTrend()}
+function renderHistory(){
+  const lev=el('history-level').value;
+  const opts=[...new Set(history.filter(r=>r.level===lev).map(r=>r.name))].sort();
+  const old=el('history-sector').value;
+  el('history-sector').innerHTML='<option value="__total__">All '+(lev==='retail'?'retail subsectors':'industries')+'</option>'+opts.map(n=>'<option value="'+escapeText(n)+'">'+escapeText(n)+'</option>').join('');
+  el('history-sector').value=opts.includes(old)?old:'__total__';
+  renderTrend();
+}
 function escapeText(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
-function renderTrend(){let rows=selectedHistory(),map=new Map();for(const r of rows)map.set(r.period,(map.get(r.period)||0)+r.receipts);let data=[...map].sort((a,b)=>a[0].localeCompare(b[0]));el('history-count').textContent=data.length+' observed month(s), '+rows.length+' source rows.';let latest=data.at(-1);el('history-latest').textContent=latest?fmtShort(latest[1]):'—';el('history-latest-date').textContent=latest?latest[0]:'No selected observations';let back=latest&&(Number(latest[0].slice(0,4))-1)+latest[0].slice(4);let earlier=data.find(d=>d[0]===back);el('history-yoy').textContent=latest&&earlier&&earlier[1]!==0?((latest[1]/earlier[1]-1)*100).toFixed(2)+'%':'Not available';const chart=el('history-chart');if(!data.length){chart.innerHTML='<p class="status">Load a historical CSV to display a time series.</p>';return;}let min=Math.min(...data.map(d=>d[1])),max=Math.max(...data.map(d=>d[1]));if(min===max){min=Math.max(0,min*.85);max=max*1.15||1;}const W=720,H=270,L=82,R=20,T=15,B=40,p= (x,i)=>L+i*(W-L-R)/Math.max(1,data.length-1),q=v=>T+(max-v)*(H-T-B)/(max-min);let path=data.map((d,i)=>(i?'L':'M')+p(d,i).toFixed(1)+','+q(d[1]).toFixed(1)).join(' ');let grids=Array.from({length:5},(_,i)=>{let v=min+(max-min)*(4-i)/4,y=q(v);return `<line class="gridline" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text x="${L-8}" y="${y+4}" text-anchor="end">${escapeText(fmtShort(v))}</text>`}).join('');let ticks=data.filter((_,i)=>i===0||i===data.length-1||i%Math.max(1,Math.ceil(data.length/7))===0).map((d)=>{let i=data.indexOf(d);return `<text x="${p(d,i)}" y="${H-12}" text-anchor="middle">${escapeText(d[0].slice(2))}</text>`}).join('');chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Observed monthly receipts trend for selected series">${grids}<path class="line" d="${path}"/>${data.length<30?data.map((d,i)=>`<circle class="dot" cx="${p(d,i)}" cy="${q(d[1])}" r="3.5"><title>${escapeText(d[0])}: ${escapeText(fmoney(d[1]))}</title></circle>`).join(''):''}${ticks}</svg>`;}
+function renderTrend(){
+  const rows=selectedHistory(), totals=new Map();
+  for(const r of rows) totals.set(r.period,(totals.get(r.period)||0)+r.receipts);
+  const nominal=[...totals].sort((a,b)=>a[0].localeCompare(b[0]));
+  const real=isReal();
+  const data=nominal.map(([period,value])=>[period,real?realDollars(period,value):value]);
+  const valid=data.filter(d=>d[1]!==null && Number.isFinite(d[1]));
+  el('history-count').textContent=nominal.length+' observed month(s), '+rows.length+' source rows.';
+  const latest=nominal.at(-1);
+  const latestValue=latest ? (real?realDollars(latest[0],latest[1]):latest[1]):null;
+  el('history-latest').textContent=latestValue===null?'—':fmtShort(latestValue);
+  el('history-latest-date').textContent=latest?prettyMonth(latest[0])+(real?' · constant '+prettyMonth(cpiBasePeriod)+' dollars':''):'No observations';
+  const prev=latest ? totals.get(lastYear(latest[0])):null;
+  let yoy=null;
+  if(latest && prev!==undefined && prev!==0){
+    const nominalRate=latest[1]/prev-1;
+    const priceRatio=latest?inflationRatio(latest[0]):null;
+    yoy=real?(priceRatio===null?null:100*((1+nominalRate)/priceRatio-1)):100*nominalRate;
+  }
+  el('history-yoy').textContent=yoy===null?'—':yoy.toFixed(2)+'%';
+  const chart=el('history-chart');
+  if(!valid.length){chart.innerHTML='<p class="status">No data for this selection or CPI is unavailable.</p>';return;}
+  let min=Math.min(...valid.map(d=>d[1])),max=Math.max(...valid.map(d=>d[1]));
+  if(min===max){min-=1;max+=1;}
+  const W=850,H=340,L=95,R=24,T=18,B=47;
+  const px=i=>L+i*(W-L-R)/Math.max(1,data.length-1);
+  const py=v=>T+(max-v)*(H-T-B)/(max-min);
+  let path='',drawing=false;
+  data.forEach(([period,value],i)=>{
+    if(value===null || !Number.isFinite(value)){drawing=false;return;}
+    path+=(drawing?'L':'M')+px(i).toFixed(1)+','+py(value).toFixed(1)+' ';drawing=true;
+  });
+  const grids=Array.from({length:5},(_,i)=>{
+    const v=min+(max-min)*(4-i)/4,y=py(v);
+    return `<line class="gridline" x1="${L}" x2="${W-R}" y1="${y}" y2="${y}"/><text x="${L-8}" y="${y+4}" text-anchor="end">${escapeText(fmtShort(v))}</text>`;
+  }).join('');
+  const ticks=data.filter((_,i)=>i===0 || i===data.length-1 || i%Math.max(1,Math.ceil(data.length/6))===0)
+    .map(d=>{const i=data.indexOf(d);return `<text x="${px(i)}" y="${H-14}" text-anchor="middle">${escapeText(d[0].slice(2))}</text>`}).join('');
+  chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${real?'Inflation adjusted':'Nominal'} monthly industry receipts">${grids}<path class="line" d="${path.trim()}"/>${ticks}</svg>`;
+}
 async function readFile(id){const f=el(id).files[0];if(!f)return null;if(f.size>40*1024*1024)throw Error('CSV too large (>40 MB). Use smaller year ranges.');return parseCSV(await f.text())}
-el('historical-file').onchange=async()=>{try{const rows=await readFile('historical-file');if(!rows)return;const required=['period','level','name','receipts'];if(!rows.length||required.some(k=>!(k in rows[0])))throw Error('Missing columns. Required: '+required.join(', '));let seen=new Set();const parsed=rows.map((r,i)=>{let period=r.period,level=r.level.toLowerCase(),n=toNumber(r.receipts),name=r.name;if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period))throw Error('Invalid period on row '+(i+2));if(!['industry','retail'].includes(level))throw Error('Invalid level on row '+(i+2));if(!Number.isFinite(n)||n<0||!name)throw Error('Invalid receipts or missing name on row '+(i+2));let key=[period,level,name].join('|');if(seen.has(key))throw Error('Duplicate period/level/name: '+key);seen.add(key);return{period,level,name,receipts:n,group:r.group||''}});history=parsed;el('history-state').textContent='Imported • '+history.length+' observations';el('history-msg').textContent='Loaded '+history.length+' independently supplied observations. No data were imputed.';renderHistory()}catch(e){el('history-msg').textContent='Import failed: '+e.message;el('history-state').textContent='Snapshot only'}};
+el('historical-file').onchange=async()=>{try{const rows=await readFile('historical-file');if(!rows)return;const required=['period','level','name','receipts'];if(!rows.length||required.some(k=>!(k in rows[0])))throw Error('Missing columns. Required: '+required.join(', '));let seen=new Set();const parsed=rows.map((r,i)=>{let period=r.period,level=r.level.toLowerCase(),n=toNumber(r.receipts),name=r.name;if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period))throw Error('Invalid period on row '+(i+2));if(!['industry','retail'].includes(level))throw Error('Invalid level on row '+(i+2));if(!Number.isFinite(n)||!name)throw Error('Invalid receipts or missing name on row '+(i+2));let key=[period,level,name].join('|');if(seen.has(key))throw Error('Duplicate period/level/name: '+key);seen.add(key);return{period,level,name,receipts:n,group:r.group||''}});history=parsed;el('history-state').textContent='Imported • '+history.length+' observations';el('history-msg').textContent='Loaded '+history.length+' independently supplied observations. No data were imputed.';renderHistory()}catch(e){el('history-msg').textContent='Import failed: '+e.message;el('history-state').textContent='Snapshot only'}};
 el('history-level').onchange=renderHistory;el('history-sector').onchange=renderTrend;el('reset-history').onclick=()=>{history=[];el('historical-file').value='';el('history-state').textContent='Snapshot only';el('history-msg').textContent='Historical data cleared.';renderHistory()};
-function renderLocal(){const county=el('local-county').value,period=el('local-period').value;let a=locals.filter(x=>x.county===county&&x.period===period).sort((x,y)=>y.payment-x.payment);el('local-rows').innerHTML=a.map(x=>`<tr><td>${escapeText(x.city)}</td><td class="num">${fmoney(x.payment)}</td><td class="num">${fmoney(x.prior)}</td><td class="num">${x.prior>0?((x.payment/x.prior-1)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')||'<tr><td colspan="4">No records for this selection.</td></tr>';let s=a.reduce((v,x)=>v+x.payment,0);el('local-msg').textContent=a.length+' cities in '+county+' for '+period+'. Sum of city allocations: '+fmoney(s)+'. Not countywide taxable sales.';}
+function renderLocal(){
+  const county=el('local-county').value,period=el('local-period').value,real=isReal();
+  const a=locals.filter(x=>x.county===county&&x.period===period).sort((x,y)=>y.payment-x.payment);
+  const total=a.reduce((v,x)=>v+x.payment,0);
+  const totalDisplay=real?realDollars(period,total):total;
+  const head=el('local-module').querySelectorAll('thead th');
+  if(head.length>=4){head[1].textContent=real?'Real allocation':'Allocation';head[2].textContent=real?'Prior year (real)':'Prior year';head[3].textContent=real?'Real YoY':'YoY';}
+  el('local-rows').innerHTML=a.map(x=>{
+    const current=real?realDollars(period,x.payment):x.payment;
+    const prev=real?realDollars(lastYear(period),x.prior):x.prior;
+    const growth=prev!==null && current!==null && prev!==0?100*(current/prev-1):null;
+    return `<tr><td>${escapeText(x.city)}</td><td class="num">${current===null?'—':fmoney(current)}</td><td class="num">${prev===null?'—':fmoney(prev)}</td><td class="num">${growth===null?'—':growth.toFixed(1)+'%'}</td></tr>`;
+  }).join('')||'<tr><td colspan="4">No records for this selection.</td></tr>';
+  el('local-msg').innerHTML=`<strong>${a.length} cities</strong> · <strong>${totalDisplay===null?'—':fmoney(totalDisplay)}</strong> ${real?'real':'nominal'} allocations · <strong>${escapeText(prettyMonth(period))}</strong><span class="city-source-note">${real&&totalDisplay===null?'CPI for this month not yet available. ':'Not countywide taxable sales.'}</span>`;
+}
 el('local-file').onchange=async()=>{try{let rows=await readFile('local-file');if(!rows)return;let req=['county','city','net_payment_this_period','comparable_payment_prior_year','report_month','report_year'];if(!rows.length||req.some(k=>!(k in rows[0])))throw Error('Expected fetch_local.py CSV with columns: '+req.join(', '));let out=rows.map((r,i)=>{let m=Number(r.report_month),y=Number(r.report_year),payment=toNumber(r.net_payment_this_period),prior=toNumber(r.comparable_payment_prior_year);if(!Number.isInteger(m)||m<1||m>12||!Number.isInteger(y)||y<2000||y>2100||!Number.isFinite(payment)||!Number.isFinite(prior))throw Error('Invalid month/year/payment on row '+(i+2));return{county:r.county,city:r.city,payment,prior,period:y+'-'+String(m).padStart(2,'0')}});locals=out;const counties=[...new Set(out.map(x=>x.county))].sort(),months=[...new Set(out.map(x=>x.period))].sort();el('local-county').innerHTML=counties.map(c=>`<option value="${escapeText(c)}">${escapeText(c)}</option>`).join('');el('local-period').innerHTML=months.map(c=>`<option value="${c}">${c}</option>`).join('');if(counties.includes('Harris'))el('local-county').value='Harris';el('local-period').value=months.at(-1);renderLocal()}catch(e){el('local-msg').textContent='Import failed: '+e.message}};el('local-county').onchange=renderLocal;el('local-period').onchange=renderLocal;renderHistory();
 
 async function loadHistoricalData() {
@@ -112,11 +217,11 @@ cityHistorySection.innerHTML = `
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin:14px 0">
     <label>First city <select id="city-compare-a" aria-label="First city"></select></label>
     <label>Second city <select id="city-compare-b" aria-label="Second city"></select></label>
-    <label>Metric <select id="city-compare-metric"><option value="amount">Monthly allocation ($)</option><option value="yoy">Year-over-year (%)</option></select></label>
+    <label>Metric <select id="city-compare-metric"><option value="amount">Monthly allocation ($)</option><option value="yoy">Year-over-year growth (%)</option><option value="ma12">12-month moving average ($)</option><option value="index">Indexed (first common month = 100)</option></select></label>
   </div>
   <div id="city-compare-summary" class="status">Loading historical allocations…</div>
   <div id="city-compare-chart" style="width:100%;overflow-x:auto"></div>
-  <p style="font-size:12px;color:#66758b">Source: Texas Comptroller. Payment-month allocations may include adjustments and tax-rate changes.</p>`;
+  <p style="font-size:12px;color:#66758b">Source: Texas Comptroller. Allocation month, not taxable-sales month; values may include adjustments or tax-rate changes.</p>`;
 const localModule = document.getElementById('local-module');
 if (localModule) localModule.insertAdjacentElement('afterend', cityHistorySection);
 let cityHistoryRows = [];
@@ -162,30 +267,54 @@ function setupCityComparisons() {
   for (const name of ['city-compare-a','city-compare-b','city-compare-metric']) el(name).onchange = renderCityComparisons;
   renderCityComparisons();
 }
-function renderCityComparisons() {
-  const ids = [el('city-compare-a').value,el('city-compare-b').value];
-  const metric = el('city-compare-metric').value;
-  const maps = ids.map(id => new Map(cityHistoryRows.filter(x=>x.id===id).map(x=>[x.period, x])));
-  const periods = [...new Set([...maps[0].keys(),...maps[1].keys()])].sort();
-  const series = maps.map(m => periods.map(p => {
-    const r=m.get(p);return r?(metric==='amount'?r.payment:(r.prior!==0?100*(r.payment/r.prior-1):null)):null;
-  }));
-  const values=series.flat().filter(x=>x!==null && Number.isFinite(x));
-  if (!values.length) {el('city-compare-chart').textContent='No comparable observations.';return;}
-  let lo=Math.min(...values),hi=Math.max(...values);if(lo===hi){lo-=1;hi+=1;}
-  const W=980,H=330,L=105,R=22,T=25,B=52, w=W-L-R,h=H-T-B;
-  const xp=i=>L+i*w/Math.max(1,periods.length-1),yp=v=>T+h-(v-lo)*h/(hi-lo);
-  const colors=['#3d68b1','#b87c39'];
+function renderCityComparisons(){
+  const ids=[el('city-compare-a').value,el('city-compare-b').value];
+  const metric=el('city-compare-metric').value,real=isReal();
+  const maps=ids.map(id=>new Map(cityHistoryRows.filter(x=>x.id===id).map(x=>[x.period,x])));
+  const periods=[...new Set([...maps[0].keys(),...maps[1].keys()])].sort();
+  const first=periods.find(p=>maps.every(m=>m.has(p)&&(real?realDollars(p,m.get(p).payment)!==null:true)));
+  const series=maps.map(m=>{
+    const anchor=first&&m.has(first)?(real?realDollars(first,m.get(first).payment):m.get(first).payment):null;
+    const values=periods.map(p=>{
+      const r=m.get(p);if(!r)return null;
+      const cur=real?realDollars(p,r.payment):r.payment;
+      if(cur===null)return null;
+      if(metric==='amount')return cur;
+      if(metric==='index')return anchor!==null && anchor!==0?100*cur/anchor:null;
+      if(metric==='ma12'){
+        let sum=0;
+        for(let k=0;k<12;k++){
+          const yr=Number(p.slice(0,4)),mo=Number(p.slice(5));
+          const d=new Date(Date.UTC(yr,mo-1-k,1));
+          const key=d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0');
+          const found=m.get(key);if(!found)return null;
+          const v=real?realDollars(key,found.payment):found.payment;
+          if(v===null)return null;
+          sum+=v;
+        }
+        return sum/12;
+      }
+      const ratio=real?inflationRatio(p):1;
+      return r.prior!==0 && ratio!==null?100*((r.payment/r.prior)/ratio-1):null;
+    });
+    return values;
+  });
+  const valid=series.flat().filter(x=>x!==null && Number.isFinite(x));
+  if(!valid.length){el('city-compare-chart').textContent='No comparable observations for this selection.';el('city-compare-summary').textContent='Check CPI availability or select another metric.';return;}
+  let lo=Math.min(...valid),hi=Math.max(...valid);if(lo===hi){lo-=1;hi+=1;}
+  const W=980,H=355,L=110,R=25,T=24,B=52,w=W-L-R,h=H-T-B;
+  const xp=i=>L+i*w/Math.max(1,periods.length-1),yp=v=>T+h-(v-lo)*h/(hi-lo), colors=['#3d68b1','#b87c39'];
   function pathFor(points){let d='',open=false;points.forEach((v,i)=>{if(v===null || !Number.isFinite(v)){open=false;return;}d+=(open?'L':'M')+xp(i).toFixed(2)+','+yp(v).toFixed(2)+' ';open=true;});return d;}
-  const fmt=v=>metric==='amount'?fmoney(v):v.toFixed(1)+'%';
-  const grid=[0,0.25,0.5,0.75,1].map(t=>{let y=T+t*h,v=hi-t*(hi-lo);return `<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#e3e8f0"/><text x="${L-9}" y="${y+4}" font-size="12" text-anchor="end" fill="#64748b">${escapeText(metric==='amount'?fmtShort(v):v.toFixed(1)+'%')}</text>`;}).join('');
-  const labels=[0,0.25,0.5,0.75,1].map(t=>{let i=Math.min(periods.length-1,Math.floor(t*(periods.length-1)));return `<text x="${xp(i)}" y="${H-20}" font-size="12" text-anchor="middle" fill="#64748b">${periods[i]}</text>`;}).join('');
-  el('city-compare-chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:580px" role="img" aria-label="Comparison of two city allocation series">${grid}${labels}${series.map((s,i)=>`<path d="${pathFor(s)}" fill="none" stroke="${colors[i]}" stroke-width="2.7"/>`).join('')}</svg>`;
+  const format=v=>metric==='amount'||metric==='ma12'?fmoney(v):metric==='index'?v.toFixed(1):v.toFixed(1)+'%';
+  const axis=v=>metric==='amount'||metric==='ma12'?fmtShort(v):metric==='index'?v.toFixed(0):v.toFixed(1)+'%';
+  const grid=[0,.25,.5,.75,1].map(t=>{let y=T+t*h,v=hi-t*(hi-lo);return `<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#e3e8f0"/><text x="${L-9}" y="${y+4}" font-size="12" text-anchor="end" fill="#64748b">${escapeText(axis(v))}</text>`}).join('');
+  const labels=[0,.25,.5,.75,1].map(t=>{let i=Math.min(periods.length-1,Math.floor(t*(periods.length-1)));return `<text x="${xp(i)}" y="${H-20}" font-size="12" text-anchor="middle" fill="#64748b">${periods[i]}</text>`}).join('');
+  el('city-compare-chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:580px" role="img" aria-label="Monthly municipal allocations comparison">${grid}${labels}${series.map((s,i)=>`<path d="${pathFor(s)}" fill="none" stroke="${colors[i]}" stroke-width="2.7"/>`).join('')}</svg>`;
   el('city-compare-summary').innerHTML=ids.map((id,i)=>{
     const idx=series[i].findLastIndex(v=>v!==null && Number.isFinite(v));
-    const last=idx>=0?`${fmt(series[i][idx])} (${periods[idx]})`:'no observations';
+    const last=idx>=0?`${format(series[i][idx])} (${prettyMonth(periods[idx])})`:'not available';
     return `<span style="display:inline-block;margin:0 28px 7px 0"><span style="color:${colors[i]}">●</span> <b>${escapeText(id.replace('|',' / '))}</b>: ${escapeText(last)}</span>`;
-  }).join('') + `<div>${periods.length} months represented; missing months are not interpolated.</div>`;
+  }).join('')+`<div>${periods.length} months · ${real?'inflation-adjusted':'nominal'} · ${metric==='index'?'index base '+(first||'unavailable')+' = 100':metric==='ma12'?'trailing 12-month average':'missing months are not interpolated'}</div>`;
 }
 async function autoLoadCities() {
   try {
