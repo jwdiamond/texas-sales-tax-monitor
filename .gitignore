@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+*.bak
+*.before-*
+source_data/
+indicators/
+forecasting/output/
+release_tracking/
+normalized/current_naics_import_receipt.json
+local_2026.csv
+
+# Experimental forecasting research
+compare_economic_models.py
+compare_forecasts.py
+create_nowcast.py
+evaluate_nowcasts.py
+fetch_economic_indicators.py
+forecast_baseline.py
+indicator_ablation.py
+realtime_forecast.py
+release_nowcast.py
+safe_refresh.py
+update_current_naics.py
+test_*.py
