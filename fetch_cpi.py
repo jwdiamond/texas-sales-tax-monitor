@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import tempfile
 import urllib.request
+import time
 
 ROOT = Path(__file__).resolve().parent
 OUTPUT = ROOT / 'inflation' / 'cpi_u.csv'
@@ -50,11 +51,25 @@ def parse(text):
     writer.writerows((m,format(out[m],'.3f')) for m in months)
     return sio.getvalue().encode('utf-8'), len(months), months[-1]
 
+
 def main():
-    req = urllib.request.Request(URL, headers={'User-Agent':'TexasSalesTaxMonitor/1.0 public research'})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        body = resp.read(5_000_001)
-    if len(body)>5_000_000:
+    req = urllib.request.Request(
+        URL,
+        headers={'User-Agent': 'TexasSalesTaxMonitor/1.0 public research'}
+    )
+
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                body = resp.read(5_000_001)
+            break
+        except (TimeoutError, OSError) as exc:
+            if attempt == 2:
+                raise
+            print(f'CPI download attempt {attempt + 1} failed: {exc}')
+            time.sleep(5 * (attempt + 1))
+
+    if len(body) > 5_000_000:
         raise ValueError('CPI download exceeds maximum size')
     result, count, last = parse(body.decode('utf-8-sig'))
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
